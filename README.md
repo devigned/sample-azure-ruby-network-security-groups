@@ -1,2 +1,6 @@
-# sample-azure-ruby-network-security-groups
-sample for performing crud on network security groups
+# Sample Azure Ruby Network Security Groups
+Sample for performing crud on network security rules / groups
+
+## To Run
+- `bundle install`
+- `bundle exec sample.rb`
