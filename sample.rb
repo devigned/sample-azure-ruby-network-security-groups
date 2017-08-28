@@ -98,11 +98,31 @@ def run_example
   puts rule = networking.security_rules.create_or_update(GROUP_NAME, 'sample-ruby-nsg', 'sample-ruby-rule2', rule2)
 
   puts "\nList security rules: "
-  puts networking.security_rules.list(GROUP_NAME, 'sample-ruby-nsg')
+  rules = networking.security_rules.list(GROUP_NAME, 'sample-ruby-nsg')
+  puts rules
 
   puts "\nShow Network Security Group: "
   puts networking.network_security_groups.get(GROUP_NAME, 'sample-ruby-nsg')
 
+  rule_id = rules[0].id
+  puts "\nFetching id: #{rule_id} by creating a generic HTTP get request"
+  fetch_by_id = networking.make_request(:get,
+                                        rule_id,
+                                        query_params: { 'api-version': '2017-06-01' })
+  puts fetch_by_id
+
+
+  parsed_id = parse(rule_id)
+  puts "\nFetching id: #{rule_id} after parsing into: #{parsed_id}"
+  fetched_rule = networking.security_rules.get(parsed_id[:group], parsed_id[:nsg], parsed_id[:name])
+  puts fetched_rule
+end
+
+# id looks like: /subscriptions/sub_id/resourceGroups/resource_group_name/providers/Microsoft.Network/networkSecurityGroups/network_security_group_name/securityRules/security_rule_name
+def parse(id)
+  regex = /.+\/resourceGroups\/([^\/]+)\/providers\/Microsoft.Network\/networkSecurityGroups\/([^\/]+)\/securityRules\/([^\/]+).*/
+  captures = regex.match(id).captures
+  {group: captures[0], nsg: captures[1], name: captures[2]}
 end
 
 def print_item(group)
